@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測試問卷系統</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #333; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        .status { text-align: center; margin-top: 15px; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>測試問卷</h2>
+    <div class="form-group">
+        <label>測試姓名</label>
+        <input type="text" id="name" placeholder="例如：王大明">
+    </div>
+    <div class="form-group">
+        <label>聯絡電話</label>
+        <input type="text" id="phone" placeholder="0912-345-678">
+    </div>
+    <div class="form-group">
+        <label>你對 GAS 的了解</label>
+        <select id="level">
+            <option value="完全不懂">完全不懂</option>
+            <option value="聽過名字">聽過名字</option>
+            <option value="略懂略懂">略懂略懂</option>
+        </select>
+    </div>
+    <button onclick="sendData()">送出測試資料</button>
+    <div id="status" class="status"></div>
+</div>
+
+<script>
+    async function sendData() {
+        // --- 核心步驟：把下面這串換成你部署後的 GAS 網址 ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzDKRruLtWi41qv9Ez0a669XRELZiq1fpsHLUckXLevBQN-vUbSxXPqpbB-g81kwk4M/exec';
+        const statusDiv = document.getElementById('status');
+        
+        const data = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            level: document.getElementById('level').value
+        };
+
+        if(!data.name || !data.phone) {
+            alert('請填寫姓名與電話！');
+            return;
+        }
+
+        statusDiv.innerText = '傳送中...';
+
+        try {
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(data)
+            });
+            statusDiv.style.color = 'green';
+            statusDiv.innerText = '成功！請去查看試算表。';
+            // 清空表單
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+        } catch (error) {
+            statusDiv.style.color = 'red';
+            statusDiv.innerText = '失敗，請檢查網址或權限。';
+        }
+    }
+</script>
+
+</body>
+</html>
